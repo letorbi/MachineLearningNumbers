@@ -1,0 +1,2 @@
+rootProject.name='Machine Learning Numbers'
+include ':app'
