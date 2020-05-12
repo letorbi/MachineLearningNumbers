@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Machine Learning Numbers</string>
+    <string name="prediction_default">Waiting for input...</string>
+    <string name="reset_button">Reset</string>
 </resources>
