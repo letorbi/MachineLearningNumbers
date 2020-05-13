@@ -63,27 +63,29 @@ public class DigitClassifier {
     }
 
     private ByteBuffer preprocessBitmap(Bitmap bitmap) {
+        // the byte buffer hold the input data
+        ByteBuffer inputBuffer = ByteBuffer.allocateDirect(inputSize);
+        inputBuffer.order(ByteOrder.nativeOrder());
+        // scale the bitmap to the size required by the interpreter and get the pixel values
         int[] pixels = new int[inputWidth * inputHeight];
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, inputWidth, inputHeight, true);
         scaledBitmap.getPixels(pixels, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
-
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(inputSize);
-        byteBuffer.order(ByteOrder.nativeOrder());
-
+        // convert RGB into floats between 0 and 1 and write the result into the input buffer
         for (int pixel : pixels) {
             int r = (pixel >> 16 & 0xFF);
             int g = (pixel >> 8 & 0xFF);
             int b = (pixel & 0xFF);
-            // Convert RGB to grayscale and normalize pixel value
             float normalizedPixel = (r + g + b) / 3.0f / 255.0f;
-            byteBuffer.putFloat(normalizedPixel);
+            inputBuffer.putFloat(normalizedPixel);
         }
-        return byteBuffer;
+        return inputBuffer;
     }
 
     private ByteBuffer loadModel() throws IOException {
+        // get asset file and create input stream
         AssetFileDescriptor fd = context.getAssets().openFd(MODEL_FILE);
         FileInputStream is = new FileInputStream(fd.getFileDescriptor());
+        // convert input stream into byte buffer
         return is.getChannel().map(
             FileChannel.MapMode.READ_ONLY,
             fd.getStartOffset(),
