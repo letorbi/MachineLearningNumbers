@@ -3,6 +3,7 @@ package de.hsfl.machinelearning.numbers;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
 import android.graphics.drawable.shapes.Shape;
 import android.util.Log;
 
@@ -49,6 +50,13 @@ public class DigitClassifier {
         this.modelInputSize = 0;
         this.interpreter = null;
         Log.d(TAG, "close() done");
+    }
+
+    public void classify(Bitmap bitmap) throws IllegalStateException {
+        if (interpreter == null) {
+            throw new IllegalStateException("interpreter is not initialized");
+        }
+        Log.d(TAG, "TODO classify bitmap");
     }
 
     private ByteBuffer loadModel() throws IOException {

@@ -1,6 +1,8 @@
 package de.hsfl.machinelearning.numbers;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -51,8 +53,21 @@ public class MainActivity extends AppCompatActivity implements DrawView.OnTouchL
     public boolean onTouch(View v, MotionEvent event) {
         drawView.onTouchEvent(event);
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            Log.d(TAG, "TODO Do some classifying...");
+            classifyDrawing();
         }
         return true;
+    }
+
+    private void classifyDrawing() {
+        Bitmap bitmap = drawView.getBitmap();
+        if (bitmap != null) {
+            try {
+                digitClassifier.classify(bitmap);
+                predictionText.setText("TODO classify drawing");
+            }
+            catch (Exception e) {
+                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
