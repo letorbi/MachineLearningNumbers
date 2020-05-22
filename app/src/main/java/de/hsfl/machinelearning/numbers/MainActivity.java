@@ -70,10 +70,6 @@ public class MainActivity extends AppCompatActivity implements DrawView.OnTouchL
     }
 
     private void classifyDrawing() throws IllegalStateException {
-        Bitmap bitmap = drawView.getBitmap();
-        if (bitmap == null) {
-            throw new IllegalStateException("DrawView contains no bitmap");
-        }
-        digitClassifier.classify(bitmap);
+        // ADD SOME CODE HERE
     }
 }
