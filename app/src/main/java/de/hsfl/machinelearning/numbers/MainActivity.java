@@ -35,19 +35,6 @@ public class MainActivity extends AppCompatActivity implements DrawView.OnTouchL
         drawView.setBackgroundColor(Color.BLACK);
         drawView.setOnTouchListener(this);
         predictionText = findViewById(R.id.prediction_text);
-
-        try {
-            digitClassifier.init();
-        }
-        catch (Exception e) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        digitClassifier.close();
     }
 
     public void onResetClick(View view) {
