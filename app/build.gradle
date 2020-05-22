@@ -20,12 +20,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    // for Tensorflow model
-    aaptOptions {
-        noCompress "tflite"
-    }
-
 }
 
 dependencies {
@@ -39,7 +33,4 @@ dependencies {
 
     // drawing widget
     implementation 'com.github.divyanshub024:AndroidDraw:v0.1'
-
-    // for Tensorflow
-    implementation('org.tensorflow:tensorflow-lite:0.0.0-nightly') { changing = true }
 }
