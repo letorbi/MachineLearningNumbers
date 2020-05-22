@@ -60,8 +60,7 @@ public class MainActivity extends AppCompatActivity implements DrawView.OnTouchL
         drawView.onTouchEvent(event);
         if (event.getAction() == MotionEvent.ACTION_UP) {
             try {
-                float[] result = classifyDrawing();
-                showResult(result);
+                classifyDrawing();
             }
             catch (Exception e) {
                 Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
@@ -70,12 +69,13 @@ public class MainActivity extends AppCompatActivity implements DrawView.OnTouchL
         return true;
     }
 
-    private float[] classifyDrawing() throws IllegalStateException {
+    private void classifyDrawing() throws IllegalStateException {
         Bitmap bitmap = drawView.getBitmap();
         if (bitmap == null) {
             throw new IllegalStateException("DrawView contains no bitmap");
         }
-        return digitClassifier.classify(bitmap);
+        float[] result = digitClassifier.classify(bitmap);
+        showResult(result);
     }
 
     private void showResult(float[] result) {
