@@ -21,12 +21,11 @@ public class DigitClassifier {
     private static int FLOAT_TYPE_SIZE = 4;
     private static int PIXEL_SIZE = 1;
 
-    private Context context = null;
+    private Context context;
     private Interpreter interpreter = null;
 
-    private int inputWidth = 0; // will be inferred from TF Lite model
-    private int inputHeight = 0; // will be inferred from TF Lite model
-    private int inputSize = 0; // will be inferred from TF Lite model
+    private int inputWidth = 0;
+    private int inputHeight = 0;
 
     DigitClassifier(Context context) {
         this.context = context;
@@ -37,7 +36,6 @@ public class DigitClassifier {
         int[] inputShape = interpreter.getInputTensor(0).shape();
         this.inputWidth = inputShape[1];
         this.inputHeight = inputShape[2];
-        this.inputSize = FLOAT_TYPE_SIZE * inputShape[1] * inputShape[2] * PIXEL_SIZE;
         this.interpreter = interpreter;
         Log.d(TAG, "init() done");
     }
@@ -47,7 +45,6 @@ public class DigitClassifier {
         this.interpreter = null;
         this.inputWidth = 0;
         this.inputHeight = 0;
-        this.inputSize = 0;
         Log.d(TAG, "close() done");
     }
 
@@ -64,7 +61,7 @@ public class DigitClassifier {
 
     private ByteBuffer preprocessBitmap(Bitmap bitmap) {
         // the byte buffer hold the input data
-        ByteBuffer inputBuffer = ByteBuffer.allocateDirect(inputSize);
+        ByteBuffer inputBuffer = ByteBuffer.allocateDirect(FLOAT_TYPE_SIZE * inputWidth * inputHeight * PIXEL_SIZE);
         inputBuffer.order(ByteOrder.nativeOrder());
         // scale the bitmap to the size required by the interpreter and get the pixel values
         int[] pixels = new int[inputWidth * inputHeight];
