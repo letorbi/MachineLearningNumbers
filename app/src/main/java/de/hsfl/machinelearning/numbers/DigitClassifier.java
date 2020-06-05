@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.Tensor;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,16 +17,13 @@ import java.nio.channels.FileChannel;
 public class DigitClassifier {
     private static String TAG = "DigitClassifier";
     private static String MODEL_FILE = "mnist.tflite";
-    private static int OUTPUT_CLASSES = 10; // numbers 0 to 9
-    // TODO Could the following constants be replaced by values we get from the system?
-    private static int FLOAT_TYPE_SIZE = 4;
-    private static int PIXEL_SIZE = 1;
 
     private Context context;
     private Interpreter interpreter = null;
 
     private int inputWidth = 0;
     private int inputHeight = 0;
+    private int inputSize = 0;
 
     DigitClassifier(Context context) {
         this.context = context;
@@ -33,9 +31,13 @@ public class DigitClassifier {
 
     public void init() throws IOException {
         Interpreter interpreter = new Interpreter(loadModel(), createOptions());
-        int[] inputShape = interpreter.getInputTensor(0).shape();
+        Tensor inputTensor = interpreter.getInputTensor(0);
+        int[] inputShape = inputTensor.shape();
+        Log.d(TAG, ""+inputShape[0]);
         this.inputWidth = inputShape[1];
         this.inputHeight = inputShape[2];
+        this.inputSize = inputTensor.numBytes();
+        Log.d(TAG, "Tensor data type: " + inputTensor.dataType().toString());
         this.interpreter = interpreter;
         Log.d(TAG, "init() done");
     }
@@ -48,31 +50,26 @@ public class DigitClassifier {
         Log.d(TAG, "close() done");
     }
 
-    public float[] classify(Bitmap bitmap) throws IllegalStateException {
+    public float[][] classify(Bitmap bitmap) throws IllegalStateException {
         if (interpreter == null) {
             throw new IllegalStateException("interpreter is not initialized");
         }
-        ByteBuffer byteBuffer = preprocessBitmap(bitmap);
-        float[][] result = new float[1][OUTPUT_CLASSES];
-        interpreter.run(byteBuffer, result);
+        ByteBuffer inputBuffer = preprocessBitmap(bitmap);
+        float[][] result = new float[1][10]; // numbers 0 to 9
+        interpreter.run(inputBuffer, result);
         Log.d(TAG, "classify() done");
-        return result[0];
+        return result;
     }
 
     private ByteBuffer preprocessBitmap(Bitmap bitmap) {
-        // the byte buffer hold the input data
-        ByteBuffer inputBuffer = ByteBuffer.allocateDirect(FLOAT_TYPE_SIZE * inputWidth * inputHeight * PIXEL_SIZE);
+        ByteBuffer inputBuffer = ByteBuffer.allocateDirect(inputSize);
         inputBuffer.order(ByteOrder.nativeOrder());
-        // scale the bitmap to the size required by the interpreter and get the pixel values
         int[] pixels = new int[inputWidth * inputHeight];
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, inputWidth, inputHeight, true);
-        scaledBitmap.getPixels(pixels, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
-        // convert RGB into floats between 0 and 1 and write the result into the input buffer
+        Bitmap scaled = Bitmap.createScaledBitmap(bitmap, inputWidth, inputHeight, true);
+        scaled.getPixels(pixels, 0, scaled.getWidth(), 0, 0, scaled.getWidth(), scaled.getHeight());
         for (int pixel : pixels) {
-            int r = (pixel >> 16 & 0xFF);
-            int g = (pixel >> 8 & 0xFF);
-            int b = (pixel & 0xFF);
-            float normalizedPixel = (r + g + b) / 3.0f / 255.0f;
+            int sum = (pixel>>16 & 0xFF) + (pixel>>8 & 0xFF) + (pixel & 0xFF); // red + green + blue
+            float normalizedPixel = sum / 3.0f / 255.0f;
             inputBuffer.putFloat(normalizedPixel);
         }
         return inputBuffer;
