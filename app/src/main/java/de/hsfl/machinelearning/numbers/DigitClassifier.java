@@ -43,11 +43,13 @@ public class DigitClassifier {
     }
 
     public void close() {
-        this.interpreter.close();
-        this.interpreter = null;
-        this.inputWidth = 0;
-        this.inputHeight = 0;
-        Log.d(TAG, "close() done");
+        if (this.interpreter != null) {
+            this.interpreter.close();
+            this.interpreter = null;
+            this.inputWidth = 0;
+            this.inputHeight = 0;
+            Log.d(TAG, "close() done");
+        }
     }
 
     public float[][] classify(Bitmap bitmap) throws IllegalStateException {
@@ -55,6 +57,7 @@ public class DigitClassifier {
             throw new IllegalStateException("interpreter is not initialized");
         }
         ByteBuffer inputBuffer = preprocessBitmap(bitmap);
+        Log.d(TAG, "Bitmap byte-buffer size: " + inputBuffer.position());
         float[][] result = new float[1][10]; // numbers 0 to 9
         interpreter.run(inputBuffer, result);
         Log.d(TAG, "classify() done");
