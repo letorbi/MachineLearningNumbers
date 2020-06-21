@@ -41,11 +41,13 @@ public class DigitClassifier {
     }
 
     public void close() {
-        this.interpreter.close();
-        this.interpreter = null;
-        this.inputWidth = 0;
-        this.inputHeight = 0;
-        Log.d(TAG, "close() done");
+        if (this.interpreter != null) {
+            this.interpreter.close();
+            this.interpreter = null;
+            this.inputWidth = 0;
+            this.inputHeight = 0;
+            Log.d(TAG, "close() done");
+        }
     }
 
     public float[] classify(Bitmap bitmap) throws IllegalStateException {
