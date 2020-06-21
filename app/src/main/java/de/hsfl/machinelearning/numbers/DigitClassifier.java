@@ -53,6 +53,7 @@ public class DigitClassifier {
             throw new IllegalStateException("interpreter is not initialized");
         }
         ByteBuffer byteBuffer = preprocessBitmap(bitmap);
+        Log.d(TAG, "Bitmap byte-buffer size: " + byteBuffer.position());
         float[][] result = new float[1][OUTPUT_CLASSES];
         interpreter.run(byteBuffer, result);
         Log.d(TAG, "classify() done");
